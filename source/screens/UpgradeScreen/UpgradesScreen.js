@@ -1,14 +1,32 @@
 import React, {useContext} from 'react';
-import {View, Text} from 'react-native';
-import CookieContext from '../../CookieContext';
-import UpgradeButtonType1 from './UpgradeButtonType1';
+import {View, Text, Button, TouchableOpacity} from 'react-native';
+import {CookieContext} from '../../Contexts/CookieContext';
+import {
+  screenStyles,
+  cookieScreenStyles,
+  upgradesScreenStyles,
+} from '../../styles/screenStyles';
 
 const UpgradesScreen = () => {
-  const [state, dispatch] = useContext(CookieContext);
+  const {
+    cookieAmount,
+    clickMultiplier,
+    CookieUpgradeCountHandler,
+    upgradeCost,
+  } = useContext(CookieContext);
 
   return (
-    <View>
-      <UpgradeButtonType1 />
+    <View style={screenStyles.parentScreenView}>
+      <View style={cookieScreenStyles.innerParentCookieAmountReceiver}>
+        <Text style={screenStyles.textBoldener}>{cookieAmount}</Text>
+      </View>
+      <View style={screenStyles.convenientScreenBalloon}>
+        <TouchableOpacity onPress={CookieUpgradeCountHandler}>
+          <Text style={screenStyles.textBoldener}>
+            Click Multiplier (Currently {clickMultiplier}) {upgradeCost} cookies
+          </Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };

@@ -24,7 +24,9 @@ const BottomTabBar = () => {
           } else if (route.name === 'Options') {
             iconName = focused ? 'fa-gear' : 'fa-gear';
           }
-          return <FontAwesomeIcon icon={iconName} color={color} size={size} />;
+          return (
+            <FontAwesomeIcon icon={iconName} color="#782606" size={size} />
+          );
         },
         tabBarActiveTintColor: 'tomato',
         tabBarInactiveTintColor: 'gray',

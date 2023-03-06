@@ -1,31 +1,24 @@
-import React, {useCallback, useContext} from 'react';
-import {Text, TouchableOpacity, View} from 'react-native';
+import React, {useContext} from 'react';
+import {View, Text, TouchableOpacity} from 'react-native';
+import {CookieContext} from '../../Contexts/CookieContext';
+import {screenStyles, cookieScreenStyles} from '../../styles/screenStyles';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faCookie} from '@fortawesome/free-solid-svg-icons';
-import screenStyles from '../../styles/screenStyles';
-import {CookieContext} from '../../CookieContext.js';
 
-function CookieScreen() {
-  const [state, dispatch] = useContext(CookieContext);
-
-  const CookieAmountClickHandler = useCallback(() => {
-    dispatch({type: 'CLICK_INCREMENT'});
-  }, [dispatch]);
+const CookieScreen = () => {
+  const {cookieAmount, clickMultiplier, cookieClickHandler} =
+    useContext(CookieContext);
 
   return (
-    <View style={screenStyles.parentCookieAmountReceiver}>
-      <View style={screenStyles.innerParentCookieAmountReceiver}>
-        <Text style={screenStyles.cookieAmountReceiver}>
-          {state.cookieAmount}
-        </Text>
+    <View style={screenStyles.parentScreenView}>
+      <View style={cookieScreenStyles.innerParentCookieAmountReceiver}>
+        <Text style={screenStyles.textBoldener}>{cookieAmount}</Text>
       </View>
-      <TouchableOpacity
-        style={screenStyles.cookieButton}
-        onPress={CookieAmountClickHandler}>
-        <FontAwesomeIcon icon={faCookie} size={200} color="#ad3805" />
+      <TouchableOpacity onPress={cookieClickHandler}>
+        <FontAwesomeIcon icon={faCookie} size={200} color="#782606" />
       </TouchableOpacity>
     </View>
   );
-}
+};
 
 export default CookieScreen;
