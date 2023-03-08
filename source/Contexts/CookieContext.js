@@ -5,7 +5,7 @@ import React, {
   useContext,
   useState,
 } from 'react';
-import RNFS from 'react-native-fs';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 // Importlar
 
 export const CookieContext = createContext();
@@ -24,6 +24,9 @@ const initialState = {
 const mainReducer = (state, action) => {
   switch (action.type) {
     case 'ADD_COOKIE':
+      if (state.cookieSvgCount === 6) {
+        state.cookieSvgCount = 0;
+      }
       return {
         ...state,
         cookieAmount: state.cookieAmount + state.clickMultiplier,
@@ -60,8 +63,12 @@ const mainReducer = (state, action) => {
 
 export const CookieProvider = ({children}) => {
   const [state, dispatch] = useReducer(mainReducer, initialState);
-  const filePath = `${RNFS.DocumentDirectoryPath}/gameData.json`;
-
+  gameData = {
+    cookieAmount: state.cookieAmount,
+    clickMultiplier: state.clickMultiplier,
+    upgradeCost: state.upgradeCost,
+    cookieSvgCount: state.cookieSvgCount,
+  };
   const cookieClickHandler = () => {
     dispatch({type: 'ADD_COOKIE'});
     console.log('svg count: ' + state.cookieSvgCount);
@@ -77,19 +84,10 @@ export const CookieProvider = ({children}) => {
 
   const loadGameData = async () => {
     try {
-      gameData = {
-        cookieAmount: state.cookieAmount,
-        clickMultiplier: state.clickMultiplier,
-        upgradeCost: state.upgradeCost,
-        cookieSvgCount: state.cookieSvgCount,
-      };
-      const saveFileExists = await RNFS.exists(filePath);
-      if (saveFileExists) {
-        gameData = await RNFS.readFile(filePath, 'utf8');
-        console.log('Alınan game data: ' + gameData);
-        parsedGameData = JSON.parse(gameData);
-        console.log("Parse'lanan game data: " + parsedGameData);
-        dispatch({type: 'LOAD_GAME_DATA', payload: parsedGameData});
+      const saveFile = AsyncStorage.getItem('@GameData');
+      if (saveFile != null) {
+        console.log('Alınan game data: ' + saveFile);
+        dispatch({type: 'LOAD_GAME_DATA', payload: saveFile});
       } else {
         console.log('Kayıt dosyası bulunamadı!');
       }
@@ -103,23 +101,17 @@ export const CookieProvider = ({children}) => {
   }, []);
   //Oyun ilk açıldığındaki yükleme işlevi
 
-  const [isFirstLoad, setIsFirstLoad] = useState(true);
-
   const saveGameData = async () => {
-    gameData = {
-      cookieAmount: state.cookieAmount,
-      clickMultiplier: state.clickMultiplier,
-      upgradeCost: state.upgradeCost,
-      cookieSvgCount: state.cookieSvgCount,
-    };
     try {
-      const filePath = `${RNFS.DocumentDirectoryPath}/gameData.json`;
-      console.log('İlk game data: ' + JSON.stringify(gameData));
-      console.debug("Stringify'lanmış ve gönderilecek game data: " + gameData);
-      await RNFS.writeFile(filePath, JSON.stringify(gameData), 'utf8');
+      console.log('İlk game data: ' + gameData);
+      console.debug(
+        "Stringify'lanmış ve gönderilecek game data: " +
+          JSON.stringify(gameData),
+      );
+      await AsyncStorage.setItem('@GameData', JSON.stringify(gameData));
       console.info('Dosya başarıyla yazıldı!');
     } catch (error) {
-      console.info('Oyun kaydedilemedi! ' + error);
+      console.info('Oyun kaydedilemedi! ' + error.message);
     }
   };
   useEffect(() => {
@@ -128,12 +120,7 @@ export const CookieProvider = ({children}) => {
       saveGameData();
     }, 1000);
     return () => clearTimeout(saveGameDataCounter);
-  }, [
-    state.cookieAmount,
-    state.clickMultiplier,
-    state.upgradeCost,
-    isFirstLoad,
-  ]);
+  }, [state.cookieAmount, state.clickMultiplier, state.upgradeCost]);
 
   //Oyunda her cookieAmount, clickMultiplier ya da upgradeCost değiştiğindeki o verilerin hepsini kaydetme işlevi
 

@@ -25,31 +25,31 @@ const CookieScreen = () => {
             height={200}
             onPress={cookieClickHandler}
           />
-        ) : cookieScreenStyles === 2 ? (
+        ) : cookieSvgCount === 2 ? (
           <CookieSvgStatus2
             width={200}
             height={200}
             onPress={cookieClickHandler}
           />
-        ) : cookieScreenStyles === 3 ? (
+        ) : cookieSvgCount === 3 ? (
           <CookieSvgStatus3
             width={200}
             height={200}
             onPress={cookieClickHandler}
           />
-        ) : cookieScreenStyles === 4 ? (
+        ) : cookieSvgCount === 4 ? (
           <CookieSvgStatus4
             width={200}
             height={200}
             onPress={cookieClickHandler}
           />
-        ) : cookieScreenStyles === 5 ? (
+        ) : cookieSvgCount === 5 ? (
           <CookieSvgStatus5
             width={200}
             height={200}
             onPress={cookieClickHandler}
           />
-        ) : cookieScreenStyles === 6 ? (
+        ) : cookieSvgCount === 6 ? (
           <CookieSvgStatus6
             width={200}
             height={200}
