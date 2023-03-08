@@ -6,21 +6,7 @@ import React, {
   useState,
 } from 'react';
 import RNFS from 'react-native-fs';
-import {logger} from 'react-native-logs';
 // Importlar
-
-const log = logger.createLogger({
-  transportOptions: {
-    colors: {
-      success: 'greenBright',
-      info: 'blueBright',
-      warn: 'yellowBright',
-      error: 'redBright',
-      debug: 'white',
-    },
-  },
-});
-// Havalı debugging
 
 export const CookieContext = createContext();
 export const CookieUpgradeContext = createContext();
@@ -31,6 +17,7 @@ const initialState = {
   clickMultiplier: 1,
   upgradeCost: 10,
   gameData: {},
+  cookieSvgCount: 1,
 };
 // KURABİYELER ile ilgili her şeyin ilk hali!!!!!
 
@@ -40,9 +27,11 @@ const mainReducer = (state, action) => {
       return {
         ...state,
         cookieAmount: state.cookieAmount + state.clickMultiplier,
+        cookieSvgCount: state.cookieSvgCount + 1,
         gameData: {
           ...state.gameData,
           cookieAmount: state.cookieAmount + state.clickMultiplier,
+          cookieSvgCount: state.cookieSvgCount + 1,
         },
       }; //Kurabiye miktarına 1 kurabiye (veya Tıklama Çarpanı yükseltmesinden kazanılan yüzde kadar kurabiye) ekleyen fonksiyon
     case 'UPGRADE_CLICK':
@@ -60,8 +49,8 @@ const mainReducer = (state, action) => {
       };
     case 'LOAD_GAME_DATA':
       return {
-        ...state,
         gameData: action.payload,
+        ...state,
       };
     default:
       return state;
@@ -75,6 +64,7 @@ export const CookieProvider = ({children}) => {
 
   const cookieClickHandler = () => {
     dispatch({type: 'ADD_COOKIE'});
+    console.log('svg count: ' + state.cookieSvgCount);
   };
   // Kurabiyeye tıklama handler'ı
 
@@ -87,36 +77,64 @@ export const CookieProvider = ({children}) => {
 
   const loadGameData = async () => {
     try {
-      const gameData = await RNFS.readFile(filePath, 'utf8');
-      dispatch({type: 'LOAD_GAME_DATA', payload: gameData});
-      console.debug('Dosyadan alınan veriler: ' + gameData);
+      gameData = {
+        cookieAmount: state.cookieAmount,
+        clickMultiplier: state.clickMultiplier,
+        upgradeCost: state.upgradeCost,
+        cookieSvgCount: state.cookieSvgCount,
+      };
+      const saveFileExists = await RNFS.exists(filePath);
+      if (saveFileExists) {
+        gameData = await RNFS.readFile(filePath, 'utf8');
+        console.log('Alınan game data: ' + gameData);
+        parsedGameData = JSON.parse(gameData);
+        console.log("Parse'lanan game data: " + parsedGameData);
+        dispatch({type: 'LOAD_GAME_DATA', payload: parsedGameData});
+      } else {
+        console.log('Kayıt dosyası bulunamadı!');
+      }
     } catch (error) {
       console.error('Hata! ' + error.message);
     }
   };
   useEffect(() => {
+    console.log("Load game data useEffect'i çalışıyor");
     loadGameData();
   }, []);
   //Oyun ilk açıldığındaki yükleme işlevi
 
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
+
   const saveGameData = async () => {
-    const gameData = {
+    gameData = {
       cookieAmount: state.cookieAmount,
       clickMultiplier: state.clickMultiplier,
       upgradeCost: state.upgradeCost,
+      cookieSvgCount: state.cookieSvgCount,
     };
     try {
-      parsedGameData = JSON.stringify(gameData);
-      console.debug('Kaydedilecek veriler: ' + JSON.stringify(gameData));
+      const filePath = `${RNFS.DocumentDirectoryPath}/gameData.json`;
+      console.log('İlk game data: ' + JSON.stringify(gameData));
+      console.debug("Stringify'lanmış ve gönderilecek game data: " + gameData);
       await RNFS.writeFile(filePath, JSON.stringify(gameData), 'utf8');
-      console.success('Oyun başarıyla kaydedildi!');
+      console.info('Dosya başarıyla yazıldı!');
     } catch (error) {
-      console.info('Oyun kaydedilemedi! ' + error.message);
+      console.info('Oyun kaydedilemedi! ' + error);
     }
   };
   useEffect(() => {
-    saveGameData();
-  }, [state.cookieAmount, state.clickMultiplier, state.upgradeCost]);
+    const saveGameDataCounter = setTimeout(() => {
+      console.log("save game data useEffect'i çalışıyor");
+      saveGameData();
+    }, 1000);
+    return () => clearTimeout(saveGameDataCounter);
+  }, [
+    state.cookieAmount,
+    state.clickMultiplier,
+    state.upgradeCost,
+    isFirstLoad,
+  ]);
+
   //Oyunda her cookieAmount, clickMultiplier ya da upgradeCost değiştiğindeki o verilerin hepsini kaydetme işlevi
 
   return (
@@ -125,6 +143,7 @@ export const CookieProvider = ({children}) => {
         clickMultiplier: state.clickMultiplier,
         upgradeCost: state.upgradeCost,
         cookieAmount: state.cookieAmount,
+        cookieSvgCount: state.cookieSvgCount,
         CookieUpgradeCountHandler,
         cookieClickHandler,
       }}>
