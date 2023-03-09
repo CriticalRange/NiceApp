@@ -10,16 +10,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const CookieContext = createContext();
 export const CookieUpgradeContext = createContext();
-// Bağlamlar oluşturarak istediğimiz her yerde kullanabiliriz, daha fazla bilgi edinmek isterseniz index.js dosyasını kontrol edin.
+// Context'ler oluşturarak istediğimiz her yerde kullanabiliriz, daha fazla bilgi edinmek isterseniz index.js dosyasını kontrol edin.
 
 const initialState = {
   cookieAmount: 0,
   clickMultiplier: 1,
   upgradeCost: 10,
-  gameData: {},
   cookieSvgCount: 1,
-};
-// KURABİYELER ile ilgili her şeyin ilk hali!!!!!
+}; // KURABİYELER ile ilgili her şeyin ilk hali!!!!!
 
 const mainReducer = (state, action) => {
   switch (action.type) {
@@ -52,8 +50,8 @@ const mainReducer = (state, action) => {
       };
     case 'LOAD_GAME_DATA':
       return {
-        gameData: action.payload,
         ...state,
+        gameData: action.payload,
       };
     default:
       return state;
@@ -63,15 +61,9 @@ const mainReducer = (state, action) => {
 
 export const CookieProvider = ({children}) => {
   const [state, dispatch] = useReducer(mainReducer, initialState);
-  gameData = {
-    cookieAmount: state.cookieAmount,
-    clickMultiplier: state.clickMultiplier,
-    upgradeCost: state.upgradeCost,
-    cookieSvgCount: state.cookieSvgCount,
-  };
+  const [isGameDataLoaded, setIsGameDataLoaded] = useState(false);
   const cookieClickHandler = () => {
     dispatch({type: 'ADD_COOKIE'});
-    console.log('svg count: ' + state.cookieSvgCount);
   };
   // Kurabiyeye tıklama handler'ı
 
@@ -84,43 +76,66 @@ export const CookieProvider = ({children}) => {
 
   const loadGameData = async () => {
     try {
-      const saveFile = AsyncStorage.getItem('@GameData');
-      if (saveFile != null) {
-        console.log('Alınan game data: ' + saveFile);
-        dispatch({type: 'LOAD_GAME_DATA', payload: saveFile});
-      } else {
-        console.log('Kayıt dosyası bulunamadı!');
+      const saveFile = await AsyncStorage.getItem('@GameData');
+      console.log('Alınan game data: ' + saveFile);
+      const parsedSaveFile = JSON.parse(saveFile);
+      console.log("Parse'lanmış game data: " + parsedSaveFile);
+      if (isGameDataLoaded === false) {
+        setIsGameDataLoaded(true);
       }
     } catch (error) {
-      console.error('Hata! ' + error.message);
+      console.log('Hata! ' + error.message);
+    } finally {
+      console.log('--- LOAD GAME DATA END ---');
     }
   };
   useEffect(() => {
-    console.log("Load game data useEffect'i çalışıyor");
+    console.log('--- LOAD GAME DATA START ---');
     loadGameData();
   }, []);
   //Oyun ilk açıldığındaki yükleme işlevi
 
   const saveGameData = async () => {
     try {
-      console.log('İlk game data: ' + gameData);
-      console.debug(
-        "Stringify'lanmış ve gönderilecek game data: " +
-          JSON.stringify(gameData),
-      );
-      await AsyncStorage.setItem('@GameData', JSON.stringify(gameData));
-      console.info('Dosya başarıyla yazıldı!');
+      if (isGameDataLoaded) {
+        const saveFile = await AsyncStorage.getItem('@GameData');
+        console.log('(isGameDataLoaded=true) Alınan: ' + saveFile);
+        console.log(
+          '(isGameDataLoaded=true) Gönderilecek game data: ' + saveFile,
+        );
+        await AsyncStorage.setItem('@GameData', saveFile);
+        console.info('(isGameDataLoaded=true) Dosya başarıyla yazıldı!');
+        setGameData(saveFile);
+        setIsGameDataLoaded(false);
+      } else {
+        console.log(
+          '(isGameDataLoaded=false) Gönderilecek game data: ' + gameData,
+        );
+        await AsyncStorage.setItem('@GameData', gameData);
+        console.log('(isGameDataLoaded=false) Dosya kaydedildi!');
+      }
     } catch (error) {
       console.info('Oyun kaydedilemedi! ' + error.message);
+    } finally {
+      console.log('--- SAVE GAME DATA END ---');
     }
   };
+
   useEffect(() => {
     const saveGameDataCounter = setTimeout(() => {
-      console.log("save game data useEffect'i çalışıyor");
+      console.log('--- SAVE GAME DATA START ---');
       saveGameData();
     }, 1000);
-    return () => clearTimeout(saveGameDataCounter);
-  }, [state.cookieAmount, state.clickMultiplier, state.upgradeCost]);
+    if (isGameDataLoaded) {
+      return () => clearTimeout(saveGameDataCounter);
+    }
+  }, [
+    state.cookieAmount,
+    state.clickMultiplier,
+    state.upgradeCost,
+    state.cookieSvgCount,
+    state.isGameDataLoaded,
+  ]);
 
   //Oyunda her cookieAmount, clickMultiplier ya da upgradeCost değiştiğindeki o verilerin hepsini kaydetme işlevi
 
