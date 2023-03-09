@@ -1,6 +1,6 @@
 import React, {useContext} from 'react';
 import {View, Text, TouchableOpacity} from 'react-native';
-import {CookieContext} from '../../Contexts/CookieContext';
+import {MainContext} from '../../Contexts/MainContext';
 import {screenStyles, cookieScreenStyles} from '../../styles/screenStyles';
 import CookieSvgStatus1 from '../../assets/sprites/cookieSprites/cookieSvgStatus1.svg';
 import CookieSvgStatus2 from '../../assets/sprites/cookieSprites/cookieSvgStatus2.svg';
@@ -9,9 +9,8 @@ import CookieSvgStatus4 from '../../assets/sprites/cookieSprites/cookieSvgStatus
 import CookieSvgStatus5 from '../../assets/sprites/cookieSprites/cookieSvgStatus5.svg';
 import CookieSvgStatus6 from '../../assets/sprites/cookieSprites/cookieSvgStatus6.svg';
 const CookieScreen = () => {
-  state = {};
-  const {cookieAmount, clickMultiplier, cookieSvgCount, cookieClickHandler} =
-    useContext(CookieContext);
+  const {cookieAmount, cookieSvgCount, cookieClickHandler} =
+    useContext(MainContext);
 
   return (
     <View style={screenStyles.parentScreenView}>

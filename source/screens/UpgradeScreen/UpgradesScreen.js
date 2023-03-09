@@ -1,6 +1,6 @@
 import React, {useContext} from 'react';
 import {View, Text, Button, TouchableOpacity} from 'react-native';
-import {CookieContext} from '../../Contexts/CookieContext';
+import {MainContext} from '../../Contexts/MainContext';
 import {
   screenStyles,
   cookieScreenStyles,
@@ -11,9 +11,9 @@ const UpgradesScreen = () => {
   const {
     cookieAmount,
     clickMultiplier,
-    CookieUpgradeCountHandler,
     upgradeCost,
-  } = useContext(CookieContext);
+    CookieUpgradeCountHandler,
+  } = useContext(MainContext);
 
   return (
     <View style={screenStyles.parentScreenView}>
