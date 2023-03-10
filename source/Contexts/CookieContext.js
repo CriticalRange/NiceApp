@@ -1,44 +1,20 @@
-import React, {createContext, useReducer, useContext} from 'react';
+import React from "react";
+import { cookieAmountState, cookieSvgCountState } from "./cookieAtoms";
+import { useRecoilState, useSetRecoilState } from "recoil";
+import { upgradeCostState } from "./upgradesAtoms";
 // Importlar
 
-export const initialCookieState = {
-  cookieAmount: 0,
-  cookieSvgCount: 1,
-}; // KURABİYELER ile ilgili her şeyin ilk hali!!!!!
+export const CookieContext = () => {
+  const [cookieAmount, setCookieAmount] = useRecoilState(cookieAmountState);
+  const [cookieSvgCount, setCookieSvgCount] = useRecoilState(cookieSvgCountState);
+  const [upgradeCost, setUpgradeCost] = useRecoilState(upgradeCostState);
 
-export const CookieContext = createContext();
-// Context oluşturarak istediğimiz her yerde kullanabiliriz, daha fazla bilgi edinmek isterseniz index.js dosyasını kontrol edin.
-
-// Kurabiye reducer'ı, bütün eylemler burada yapılacaktır.
-
-export const cookieReducer = (cookieState, action) => {
-  switch (action.type) {
-    case 'ADD_COOKIE':
-      if (cookieState.cookieSvgCount === 6) {
-        cookieState.cookieSvgCount = 0;
-      }
-      return {
-        ...cookieState,
-        cookieAmount: cookieState.cookieAmount + 1,
-        cookieSvgCount: cookieState.cookieSvgCount + 1,
-      }; //Kurabiye miktarına 1 kurabiye (veya Tıklama Çarpanı yükseltmesinden kazanılan yüzde kadar kurabiye + 1) ekleyen fonksiyon
-    //Upgrade reducer'ı
-  }
-};
-
-export const CookieProvider = ({children}) => {
-  const [cookieState, cookieDispatch] = useReducer(
-    cookieReducer,
-    initialCookieState,
-  );
-
-  return (
-    <CookieContext.Provider
-      value={{
-        cookieAmount: cookieState.cookieAmount,
-        cookieSvgCount: cookieState.cookieSvgCount,
-      }}>
-      {children}
-    </CookieContext.Provider>
-  );
+  const cookieClickHandler = () => {
+    console.log("CookieClickHandler used");
+    if (cookieSvgCount > 6) {
+      setCookieSvgCount(1);
+      setCookieAmount(cookieAmount + upgradeCost);
+      setCookieSvgCount(svgMover);
+    }
+  };
 };

@@ -1,20 +1,14 @@
-import React, {useContext} from 'react';
-import {View, Text, Button, TouchableOpacity} from 'react-native';
-import {MainContext} from '../../Contexts/MainContext';
-import {
-  screenStyles,
-  cookieScreenStyles,
-  upgradesScreenStyles,
-} from '../../styles/screenStyles';
+import React from "react";
+import { View, Text, Button, TouchableOpacity } from "react-native";
+import { useRecoilState } from "recoil";
+import { cookieAmountState } from "../../Contexts/cookieAtoms";
+import { clickMultiplierState, upgradeCostState } from "../../Contexts/upgradesAtoms";
+import { screenStyles, cookieScreenStyles, upgradesScreenStyles } from "../../styles/screenStyles";
 
 const UpgradesScreen = () => {
-  const {
-    cookieAmount,
-    clickMultiplier,
-    upgradeCost,
-    CookieUpgradeCountHandler,
-  } = useContext(MainContext);
-
+  const [cookieAmount, setCookieAmount] = useRecoilState(cookieAmountState);
+  const [upgradeCost, setUpgradeCost] = useRecoilState(upgradeCostState);
+  const [clickMultiplier, setClickMultiplier] = useRecoilState(clickMultiplierState);
   return (
     <View style={screenStyles.parentScreenView}>
       <View style={cookieScreenStyles.innerParentCookieAmountReceiver}>

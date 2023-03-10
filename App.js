@@ -1,15 +1,18 @@
-import React from 'react';
-import {NavigationContainer} from '@react-navigation/native';
-import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
-import BottomTabBar from './source/screens/BottomTabs/BottomTabBar';
+import React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
+import BottomTabBar from "./source/screens/BottomTabs/BottomTabBar";
+import { RecoilRoot, atom, selector, useRecoilState, useRecoilValue } from "recoil";
 
 const Tab = createMaterialBottomTabNavigator();
 
-const App = navigation => {
+const App = (navigation) => {
   return (
-    <NavigationContainer>
-      <BottomTabBar />
-    </NavigationContainer>
+    <RecoilRoot>
+      <NavigationContainer>
+        <BottomTabBar />
+      </NavigationContainer>
+    </RecoilRoot>
   );
 };
 
