@@ -3,10 +3,11 @@ import { Text, TouchableOpacity, View } from "react-native";
 import { faLightbulb } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { screenStyles, cookieScreenStyles, optionsScreenStyles } from "../../styles/screenStyles";
-import { cookieAmountState } from "../../Contexts/cookieAtoms";
+import { cookieAmountState } from "../../Contexts/CookieStates";
+import { useRecoilValue } from "recoil";
 
 const OptionsScreen = () => {
-  const [cookieAmount, setCookieAmount] = useRecoileState(cookieAmountState);
+  const [cookieAmount, setCookieAmount] = useRecoilValue(cookieAmountState);
   return (
     <View style={screenStyles.parentScreenView}>
       <View style={cookieScreenStyles.innerParentCookieAmountReceiver}>

@@ -7,9 +7,9 @@ import CookieSvgStatus3 from "../../assets/sprites/cookieSprites/cookieSvgStatus
 import CookieSvgStatus4 from "../../assets/sprites/cookieSprites/cookieSvgStatus4.svg";
 import CookieSvgStatus5 from "../../assets/sprites/cookieSprites/cookieSvgStatus5.svg";
 import CookieSvgStatus6 from "../../assets/sprites/cookieSprites/cookieSvgStatus6.svg";
-import { cookieAmountState, cookieSvgCountState } from "../../Contexts/cookieAtoms";
+import { cookieAmountState, cookieSvgCountState } from "../../Contexts/CookieStates";
 import { useRecoilValue, useRecoilCallback } from "recoil";
-import { cookieClickSelector } from "../../Contexts/cookieAtoms";
+import { cookieClickSelector } from "../../Contexts/CookieAtoms";
 //imports
 
 export const CookieScreen = () => {
@@ -39,7 +39,9 @@ export const CookieScreen = () => {
           <CookieSvgStatus5 width={200} height={200} onPress={cookieClickHandler} />
         ) : cookieSvgCount === 6 ? (
           <CookieSvgStatus6 width={200} height={200} onPress={cookieClickHandler} />
-        ) : null}
+        ) : (
+          <CookieSvgStatus1 width={200} height={200} onPress={cookieClickHandler} />
+        )}
       </TouchableOpacity>
     </View>
   );
